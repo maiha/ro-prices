@@ -1,0 +1,126 @@
+/* 本文・タイトル・日時すべて共通のフォント設定 */
+:root {
+    --base-font: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    --text-color: #333333;
+    --border-color: #cccccc;
+}
+
+/* 全体を包むコンテナを中央に寄せるための設定 */
+body {
+    margin: 0; /* 一旦リセット */
+    padding: 20px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 左右中央に配置 */
+}
+
+/* 実際に中身が入るエリア。ここで「最大幅」を決めるのがコツです */
+.page-wrapper {
+    width: 100%;
+    max-width: 1100px; /* 2つのテーブルが綺麗に並ぶくらいの幅 */
+    display: flex;
+    flex-direction: column;
+}
+
+/* ヘッダーは wrapper の中で左寄せ */
+.header-area {
+    display: flex;
+    align-items: baseline;
+    gap: 15px;
+    border-bottom: 2px solid #333;
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+    width: 100%;
+}
+
+/* テーブルが並ぶコンテナ */
+.container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* 左から並べる */
+}
+
+/* ヘッダー：フォントは同じ、サイズのみ変更 */
+.header-area {
+    display: flex;
+    align-items: baseline;
+    gap: 15px;
+    border-bottom: 2px solid #333;
+    margin-bottom: 20px;
+    padding-bottom: 5px;
+}
+
+h1 { 
+    font-family: var(--base-font);
+    font-size: 32px;    /* 22px から大幅にアップ */
+    margin: 0; 
+    font-weight: bold;
+}
+
+#last-updated { 
+    font-family: var(--base-font);
+    font-size: 24px;    /* 26px から微調整してタイトルの次点に設定 */
+    font-weight: bold;
+    color: #ff0000;
+}
+
+/* 2段組レイアウト */
+.container { display: flex; gap: 20px; flex-wrap: wrap; }
+section { flex: 1; min-width: 320px; max-width: 500px; }
+
+
+
+h2 { 
+    font-size: 14px;
+    background: #555;
+    color: #fff;
+    padding: 3px 8px;
+    margin: 0 0 5px 0;
+}
+
+/* テーブルデザイン */
+table { 
+    width: 100%; 
+    border-collapse: collapse;
+    border: 1px solid var(--border-color);
+}
+
+th { 
+    background-color: #f2f2f2;
+    padding: 5px 8px;
+    font-size: 13px;
+    border: 1px solid var(--border-color);
+}
+
+td { 
+    padding: 4px 8px; 
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+}
+
+/* 価格列：右寄せ・太字 */
+td:last-child { 
+    text-align: right; 
+    font-weight: bold;
+    color: #d35400; /* オレンジ/茶色系 */
+    width: 90px;
+}
+
+tr:nth-child(even) { background-color: #fafafa; }
+tr:hover { background-color: #ffffcc; }
+
+footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    color: #888888;
+    font-size: 11px;
+    line-height: 1.5;
+    text-align: center; /* 中央寄せが一般的です */
+}
+
+footer p {
+    margin: 0;
+}
