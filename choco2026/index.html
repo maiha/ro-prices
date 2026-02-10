@@ -3,54 +3,68 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>ロイヤルスウィートパーティー2026</title>
-    <link rel="stylesheet" href="app.css">
+    <title>チョコ2026値段まとめ</title>
+    <link rel="stylesheet" href="app.css?v=1770790724">
 </head>
 
 <body>
+    <script>
+        const APP_CONFIG = {
+            TSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTD2e3T--ElFHXrBtlj4Tufr7C4pdjHcqD_CIxEf55EW8p8aRYnNBRp4QfWdmGdAV_T-VImIXtWJazR/pub?gid=0&single=true&output=tsv",
+            ITEMS_JSON_URL: "items.json",
+        };
+    </script>
     <div class="page-wrapper">
-        <div class="header-area">
-            <h1>ロイヤルスウィートパーティー2026</h1>
-            <span id="last-updated">取得中...</span>
-        </div>
-
+        <header class="header-area">
+            <h1>チョコ2026値段まとめ</h1>
+            <div id="last-updated">Loading...</div>
+        </header>
         <div id="loading">読み込み中...</div>
-
-        <div id="content" style="display:none;" class="container">
-            <section>
+        <main id="content" class="container" style="display: none;">
+            <section id="table-name-section">
                 <h2>名前順</h2>
                 <table id="table-name">
                     <thead>
                         <tr>
-                            <th>名前</th>
+                            <th>チョコパック</th>
                             <th>価格</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </section>
-            <section>
+            <section id="table-price-section">
                 <h2>価格順</h2>
                 <table id="table-price">
                     <thead>
-                        <tr>
-                            <th>名前</th>
-                            <th>価格</th>
+                        <tr id="price-header-row">
+                            <th class="rank-col"></th>
+                            <th>チョコパック</th>
+                            <th>🔴価格</th>
+                            <th>3h</th>
+                            <th>6h</th>
+                            <th>12h</th>
+                            <th>1d</th>
+                            <th>2d</th>
+                            <th>3d</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </section>
-        </div>
-
+        </main>
+        <hr>
         <footer>
-            <p>「ラグナロクオンライン」に関連する全ての表現物の権利は以下に帰属します。<br>
-                ©Gravity Co., Ltd. & LeeMyoungJin(studio DTDS) All rights reserved.<br>
+            <p>©Gravity Co., Ltd. & LeeMyoungJin(studio DTDS) All rights reserved.<br>
                 ©GungHo Online Entertainment, Inc. All Rights Reserved.</p>
+            <p class="data-source">
+                <a href="https://docs.google.com/spreadsheets/d/1ydP-xSHC1UNq_H-elnX2oMLc9IMIgLaorEznZlfK-oo/edit?gid=0#gid=0"
+                    target="_blank" style="color: #888; text-decoration: underline;">生データ（Googleスプレッドシート）</a>
+                (使えそうならご自由にどぞ)
+            </p>
         </footer>
     </div>
-
-    <script src="app.js"></script>
+    <script src="app.js?v=1770790724"></script>
 </body>
 
 </html>
