@@ -68,11 +68,32 @@ async function init() {
             };
         });
 
-        const allP = displayData.flatMap(d => [d.current, d.h3, d.h6, d.h12, d.d1, d.d2, d.d3]).filter(p => p > 0).sort((a, b) => a - b);
-        const thres = { mid: allP[Math.floor(allP.length * 0.5)] || Infinity, high: allP[Math.floor(allP.length * 0.8)] || Infinity };
+        const allP = displayData.flatMap(d => [d.current, d.h3, d.h6, d.h12, d.d1, d.d2]).filter(p => p > 0);
+        const uniquePrices = [...new Set(allP)].sort((a, b) => a - b);
+        const priceThres = {
+            mid: uniquePrices[Math.floor(uniquePrices.length * 0.5)] || Infinity,
+            high: uniquePrices[Math.floor(uniquePrices.length * 0.8)] || Infinity
+        };
 
-        renderTableName("table-name", [...displayData].sort((a, b) => a.shortName.localeCompare(b.shortName, 'ja')), thres);
-        renderTablePrice("table-price", [...displayData].sort((a, b) => b.current - a.current), thres);
+        const extraThresMap = new Map();
+        if (APP_CONFIG.EXTRA_JSON_URL) {
+            APP_CONFIG.EXTRA_ATTRIBUTES.forEach(attr => {
+                const vals = displayData
+                    .map(d => Number(d.extra[attr.key]))
+                    .filter(v => !isNaN(v) && v > 0);
+                const uniqueVals = [...new Set(vals)].sort((a, b) => a - b);
+                if (uniqueVals.length > 0) {
+                    extraThresMap.set(attr.key, {
+                        mid: uniqueVals[Math.floor(uniqueVals.length * 0.5)] || Infinity,
+                        high: uniqueVals[Math.floor(uniqueVals.length * 0.8)] || Infinity,
+                        max: Math.max(...uniqueVals)
+                    });
+                }
+            });
+        }
+
+        renderTableName("table-name", [...displayData].sort((a, b) => a.shortName.localeCompare(b.shortName, 'ja')), priceThres);
+        renderTablePrice("table-price", [...displayData].sort((a, b) => b.current - a.current), priceThres, extraThresMap);
 
         if (loadingEl) loadingEl.style.display = 'none';
         if (contentEl) contentEl.style.display = 'flex';
@@ -93,7 +114,7 @@ function formatVal(val, type) {
 }
 
 function getCls(val, max, thres) {
-    if (val <= 0) return "";
+    if (val <= 0 || isNaN(val)) return "";
     if (val === max) return "rank-top1";
     if (val >= thres.high) return "price-high";
     if (val >= thres.mid) return "price-mid";
@@ -107,7 +128,7 @@ function renderTableName(id, data, thres) {
     tb.innerHTML = data.map(i => `<tr><td class="name-col"><a href="https://rotool.gungho.jp/item/${i.id}/0/" target="_blank">${i.shortName}</a></td><td class="${getCls(i.current, max, thres)}">${i.current > 0 ? i.current.toLocaleString() : "-"}</td></tr>`).join('');
 }
 
-function renderTablePrice(id, data, thres) {
+function renderTablePrice(id, data, priceThres, extraThresMap) {
     const hr = document.getElementById('price-header-row');
     const tb = document.querySelector(`#${id} tbody`);
     if (!tb || !data.length) return;
@@ -122,7 +143,7 @@ function renderTablePrice(id, data, thres) {
         });
     }
 
-    const cols = ['current', 'h3', 'h6', 'h12', 'd1', 'd2', 'd3'];
+    const cols = ['current', 'h3', 'h6', 'h12', 'd1', 'd2'];
     const colMaxs = {};
     cols.forEach(c => colMaxs[c] = Math.max(...data.map(d => d[c])));
 
@@ -130,9 +151,15 @@ function renderTablePrice(id, data, thres) {
         const rank = idx === 0 ? '<span class="crown">👑</span>' : idx + 1;
         let extraHtml = "";
         if (APP_CONFIG.EXTRA_JSON_URL) {
-            extraHtml = APP_CONFIG.EXTRA_ATTRIBUTES.map(a => `<td class="extra-col" data-key="${a.key}">${formatVal(item.extra[a.key], a.format)}</td>`).join('');
+            extraHtml = APP_CONFIG.EXTRA_ATTRIBUTES.map(a => {
+                const rawVal = item.extra[a.key];
+                const numVal = Number(rawVal);
+                const thres = extraThresMap.get(a.key);
+                const cls = thres ? getCls(numVal, thres.max, thres) : "";
+                return `<td class="extra-col ${cls}" data-key="${a.key}">${formatVal(rawVal, a.format)}</td>`;
+            }).join('');
         }
-        return `<tr><td class="rank-col">${rank}</td><td class="name-col"><a href="https://rotool.gungho.jp/item/${item.id}/0/" target="_blank">${item.shortName}</a></td>${cols.map(c => `<td class="${getCls(item[c], colMaxs[c], thres)}">${item[c] > 0 ? item[c].toLocaleString() : "-"}</td>`).join('')}${extraHtml}</tr>`;
+        return `<tr><td class="rank-col">${rank}</td><td class="name-col"><a href="https://rotool.gungho.jp/item/${item.id}/0/" target="_blank">${item.shortName}</a></td>${cols.map(c => `<td class="${getCls(item[c], colMaxs[c], priceThres)}">${item[c] > 0 ? item[c].toLocaleString() : "-"}</td>`).join('')}${extraHtml}</tr>`;
     }).join('');
 }
 

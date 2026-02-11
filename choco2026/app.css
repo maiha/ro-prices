@@ -6,6 +6,7 @@
     --price-mid-bg: #e3f2fd;
     --price-high-bg: #c8e6c9;
 }
+
 body {
     margin: 0;
     padding: 20px;
@@ -14,7 +15,11 @@ body {
     flex-direction: column;
     align-items: center;
 }
-.page-wrapper { width: auto; }
+
+.page-wrapper {
+    width: auto;
+}
+
 .header-area {
     display: flex;
     align-items: baseline;
@@ -23,28 +28,132 @@ body {
     margin-bottom: 20px;
     padding-bottom: 8px;
 }
-h1 { margin: 0; font-weight: bold; }
-#last-updated { color: #666; }
-.container { display: flex; gap: 20px; justify-content: center; }
-h2 { background: #444; color: #fff; padding: 4px 10px; margin: 0 0 5px 0; }
-table { border-collapse: collapse; border: 1px solid var(--border-color); }
-th, td { padding: 4px 8px; border: 1px solid var(--border-color); vertical-align: middle; white-space: nowrap; }
-th { background-color: #eee; }
-.rank-col { width: 40px; text-align: center; color: #888; background: #f9f9f9; }
-.name-col { text-align: left; }
-#table-price td:not(.name-col):not(.rank-col):not(.extra-col), #table-name td:last-child { text-align: right; font-weight: bold; color: var(--price-orange); }
-.extra-col { color: #666; background-color: #fcfcfc; text-align: center; }
 
-td[data-key="討伐対象"] { text-align: left; color: #333; }
-td[data-key="BaseEXP"], td[data-key="ポイント"] { text-align: right; }
-th[data-key="BaseEXP"], th[data-key="ポイント"] { text-align: center; }
+h1 {
+    margin: 0;
+    font-weight: bold;
+}
 
-td.price-mid { background-color: var(--price-mid-bg) !important; }
-td.price-high { background-color: var(--price-high-bg) !important; }
-td.rank-top1 { background-color: var(--heat-top1-bg) !important; color: #ffffff !important; }
-.crown { font-size: 16px; }
-tr:hover td:not(.rank-top1) { background-color: #fffde7 !important; }
-hr { border: 0; border-top: 1px solid #ddd; margin: 40px 0 20px 0; width: 100%; }
-footer { padding-bottom: 40px; color: #888; text-align: center; }
-footer p { margin: 0 0 15px 0; }
-.data-source a { color: #888; text-decoration: underline; }
+#last-updated {
+    color: #666;
+}
+
+.container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+h2 {
+    background: #444;
+    color: #fff;
+    padding: 4px 10px;
+    margin: 0 0 5px 0;
+}
+
+table {
+    border-collapse: collapse;
+    border: 1px solid var(--border-color);
+}
+
+th, td {
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+th {
+    background-color: #eee;
+}
+
+.rank-col {
+    width: 40px;
+    text-align: center;
+    color: #888;
+    background: #f9f9f9;
+}
+
+.name-col {
+    text-align: left;
+}
+
+#table-price td:not(.name-col):not(.rank-col):not(.extra-col), 
+#table-name td:last-child {
+    text-align: right;
+    font-weight: bold;
+    color: var(--price-orange);
+}
+
+.extra-col {
+    color: #666;
+    background-color: #fcfcfc;
+    text-align: center;
+}
+
+td[data-key="討伐対象"] {
+    text-align: left;
+    color: #333;
+}
+
+td[data-key="BaseEXP"], td[data-key="ポイント"] {
+    text-align: right;
+}
+
+th[data-key="BaseEXP"], th[data-key="ポイント"] {
+    text-align: center;
+}
+
+td.price-mid {
+    background-color: var(--price-mid-bg) !important;
+}
+
+td.price-high {
+    background-color: var(--price-high-bg) !important;
+}
+
+td.rank-top1 {
+    background-color: var(--heat-top1-bg) !important;
+    color: #ffffff !important;
+}
+
+.crown {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+tr:hover td:not(.rank-top1) {
+    background-color: #fffde7 !important;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 40px 0 20px 0;
+    width: 100%;
+}
+
+footer {
+    padding-bottom: 40px;
+    color: #888;
+    text-align: center;
+}
+
+footer p {
+    margin: 0 0 15px 0;
+}
+
+footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+footer li {
+    margin-bottom: 5px;
+}
+
+.data-source a {
+    color: #888;
+    text-decoration: underline;
+}

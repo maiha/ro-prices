@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>チョコ2026値段まとめ</title>
-    <link rel="stylesheet" href="app.css?v=1770790724">
+    <link rel="stylesheet" href="app.css?v=1770796585">
 </head>
 
 <body>
@@ -12,6 +12,13 @@
         const APP_CONFIG = {
             TSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTD2e3T--ElFHXrBtlj4Tufr7C4pdjHcqD_CIxEf55EW8p8aRYnNBRp4QfWdmGdAV_T-VImIXtWJazR/pub?gid=0&single=true&output=tsv",
             ITEMS_JSON_URL: "items.json",
+            EXTRA_JSON_URL: "extra_info.json",
+            EXTRA_JOIN_KEY: "チョコパック",
+            EXTRA_ATTRIBUTES: [
+                { key: "討伐対象", label: "討伐対象" },
+                { key: "BaseEXP", label: "Base", format: "short" },
+                { key: "MAP", label: "MAP" },
+            ]
         };
     </script>
     <div class="page-wrapper">
@@ -46,7 +53,6 @@
                             <th>12h</th>
                             <th>1d</th>
                             <th>2d</th>
-                            <th>3d</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -58,13 +64,22 @@
             <p>©Gravity Co., Ltd. & LeeMyoungJin(studio DTDS) All rights reserved.<br>
                 ©GungHo Online Entertainment, Inc. All Rights Reserved.</p>
             <p class="data-source">
-                <a href="https://docs.google.com/spreadsheets/d/1ydP-xSHC1UNq_H-elnX2oMLc9IMIgLaorEznZlfK-oo/edit?gid=0#gid=0"
-                    target="_blank" style="color: #888; text-decoration: underline;">生データ（Googleスプレッドシート）</a>
-                (使えそうならご自由にどぞ)
+            <ul>
+                <li>
+                    生データ:
+                    <a href="https://docs.google.com/spreadsheets/d/1ydP-xSHC1UNq_H-elnX2oMLc9IMIgLaorEznZlfK-oo/edit?gid=0#gid=0"
+                        target="_blank" style="color: #888; text-decoration: underline;">Googleスプレッドシート</a>
+                    (使えそうならご自由にどぞ)
+                </li>
+                <li>
+                    討伐情報: <a href="http://blog.livedoor.jp/patchmatome/" target="_blank"
+                        style="color: #888; text-decoration: underline;">RO パッチスレまとめ</a>様
+                </li>
+            </ul>
             </p>
         </footer>
     </div>
-    <script src="app.js?v=1770790724"></script>
+    <script src="app.js?v=1770796585"></script>
 </body>
 
 </html>
