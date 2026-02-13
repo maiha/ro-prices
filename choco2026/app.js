@@ -57,18 +57,35 @@ async function init() {
         const refTimeMs = new Date(maxTimestamp).getTime();
 
         const displayData = items.map(item => {
-            const getPrice = (h) => {
-                const target = refTimeMs - (h * 3600000);
-                const r = allRecords.filter(r => r.id === item.id && r.ts <= target).sort((a, b) => b.ts - a.ts)[0];
-                return r ? r.price : 0;
+            const itemRecords = allRecords.filter(r => r.id === item.id);
+
+            const getMedian = (startH, endH) => {
+                const startMs = refTimeMs - (startH * 3600000);
+                const endMs = refTimeMs - (endH * 3600000);
+                const prices = itemRecords
+                    .filter(r => r.ts <= startMs && r.ts > endMs)
+                    .map(r => r.price)
+                    .sort((a, b) => a - b);
+
+                if (prices.length === 0) return 0;
+                const mid = Math.floor(prices.length / 2);
+                return prices.length % 2 !== 0 ? prices[mid] : Math.floor((prices[mid - 1] + prices[mid]) / 2);
             };
+
+            const latestRecord = [...itemRecords].sort((a, b) => b.ts - a.ts)[0];
+
             return {
                 ...item,
-                current: getPrice(0), h3: getPrice(3), h6: getPrice(6), h12: getPrice(12), d1: getPrice(24), d2: getPrice(48), d3: getPrice(72)
+                current: getMedian(0, 3),
+                h6: getMedian(3, 6),
+                h12: getMedian(6, 12),
+                d1: getMedian(12, 24),
+                d2: getMedian(24, 48),
+                d3: getMedian(48, 72)
             };
         });
 
-        const allP = displayData.flatMap(d => [d.current, d.h3, d.h6, d.h12, d.d1, d.d2]).filter(p => p > 0);
+        const allP = displayData.flatMap(d => [d.current, d.h6, d.h12, d.d1, d.d2, d.d3]).filter(p => p > 0);
         const uniquePrices = [...new Set(allP)].sort((a, b) => a - b);
         const priceThres = {
             mid: uniquePrices[Math.floor(uniquePrices.length * 0.5)] || Infinity,
@@ -143,7 +160,7 @@ function renderTablePrice(id, data, priceThres, extraThresMap) {
         });
     }
 
-    const cols = ['current', 'h3', 'h6', 'h12', 'd1', 'd2'];
+    const cols = ['current', 'h6', 'h12', 'd1', 'd2', 'd3'];
     const colMaxs = {};
     cols.forEach(c => colMaxs[c] = Math.max(...data.map(d => d[c])));
 
