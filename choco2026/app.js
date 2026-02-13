@@ -2,7 +2,9 @@ async function init() {
     const statusEl = document.getElementById('last-updated');
     const loadingEl = document.getElementById('loading');
     const contentEl = document.getElementById('content');
+    const overlay = document.getElementById('updating-overlay');
 
+    overlay.classList.add('active');
     try {
         const timestamp = Date.now();
         const fetchTasks = [
@@ -115,6 +117,7 @@ async function init() {
         if (loadingEl) loadingEl.style.display = 'none';
         if (contentEl) contentEl.style.display = 'flex';
     } catch (e) { console.error(e); }
+    overlay.classList.remove('active');
 }
 
 function formatVal(val, type) {
@@ -179,5 +182,7 @@ function renderTablePrice(id, data, priceThres, extraThresMap) {
         return `<tr><td class="rank-col">${rank}</td><td class="name-col"><a href="https://rotool.gungho.jp/item/${item.id}/0/" target="_blank">${item.shortName}</a></td>${cols.map(c => `<td class="${getCls(item[c], colMaxs[c], priceThres)}">${item[c] > 0 ? item[c].toLocaleString() : "-"}</td>`).join('')}${extraHtml}</tr>`;
     }).join('');
 }
+
+document.getElementById('reload-btn').addEventListener('click', () => init());
 
 init();
