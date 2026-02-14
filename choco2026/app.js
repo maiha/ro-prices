@@ -1,3 +1,7 @@
+// Module-scope data (populated by init, used by chart)
+let appAllRecords = [];
+let appItems = [];
+
 async function init() {
     const statusEl = document.getElementById('last-updated');
     const loadingEl = document.getElementById('loading');
@@ -49,6 +53,10 @@ async function init() {
             if (ts > maxTimestamp) maxTimestamp = ts;
             allRecords.push({ ts: new Date(ts).getTime(), id, price: Number(val) });
         });
+
+        // Expose to module scope
+        appAllRecords = allRecords;
+        appItems = items;
 
         if (statusEl && maxTimestamp) {
             const d = new Date(new Date(maxTimestamp).getTime() + 3600000);
@@ -118,6 +126,7 @@ async function init() {
         if (contentEl) contentEl.style.display = 'flex';
     } catch (e) { console.error(e); }
     overlay.classList.remove('active');
+    handleRouting();
 }
 
 function formatVal(val, type) {
@@ -145,7 +154,7 @@ function renderTableName(id, data, thres) {
     const tb = document.querySelector(`#${id} tbody`);
     if (!tb) return;
     const max = Math.max(...data.map(d => d.current));
-    tb.innerHTML = data.map(i => `<tr><td class="name-col"><a href="https://rotool.gungho.jp/item/${i.id}/0/" target="_blank">${i.shortName}</a></td><td class="${getCls(i.current, max, thres)}">${i.current > 0 ? i.current.toLocaleString() : "-"}</td></tr>`).join('');
+    tb.innerHTML = data.map(i => `<tr data-item-id="${i.id}"><td class="name-col"><a href="https://rotool.gungho.jp/item/${i.id}/0/" target="_blank">${i.shortName}</a></td><td class="${getCls(i.current, max, thres)}">${i.current > 0 ? i.current.toLocaleString() : "-"}</td></tr>`).join('');
 }
 
 function renderTablePrice(id, data, priceThres, extraThresMap) {
@@ -179,9 +188,272 @@ function renderTablePrice(id, data, priceThres, extraThresMap) {
                 return `<td class="extra-col ${cls}" data-key="${a.key}">${formatVal(rawVal, a.format)}</td>`;
             }).join('');
         }
-        return `<tr><td class="rank-col">${rank}</td><td class="name-col"><a href="https://rotool.gungho.jp/item/${item.id}/0/" target="_blank">${item.shortName}</a></td>${cols.map(c => `<td class="${getCls(item[c], colMaxs[c], priceThres)}">${item[c] > 0 ? item[c].toLocaleString() : "-"}</td>`).join('')}${extraHtml}</tr>`;
+        return `<tr data-item-id="${item.id}"><td class="rank-col">${rank}</td><td class="name-col"><a href="https://rotool.gungho.jp/item/${item.id}/0/" target="_blank">${item.shortName}</a></td>${cols.map(c => `<td class="${getCls(item[c], colMaxs[c], priceThres)}">${item[c] > 0 ? item[c].toLocaleString() : "-"}</td>`).join('')}${extraHtml}</tr>`;
     }).join('');
 }
+
+// --- SPA routing ---
+
+function navigateToItem(itemId) {
+    history.pushState({ item: itemId }, '', '?item=' + itemId);
+    handleRouting();
+}
+
+function navigateToList() {
+    history.pushState({}, '', location.pathname);
+    handleRouting();
+}
+
+let currentChart = null;
+let savedPriceWidth = 0;
+
+function handleRouting() {
+    const params = new URLSearchParams(location.search);
+    const itemId = params.get('item');
+    const contentEl = document.getElementById('content');
+    const priceSection = document.getElementById('table-price-section');
+    const detailEl = document.getElementById('detail-view');
+
+    if (itemId && appItems.length > 0) {
+        if (priceSection.offsetWidth > 0) savedPriceWidth = priceSection.offsetWidth;
+        detailEl.style.minWidth = savedPriceWidth + 'px';
+        priceSection.style.display = 'none';
+        detailEl.style.display = 'block';
+        if (contentEl.style.display === 'none') contentEl.style.display = 'flex';
+        renderChart(itemId);
+        highlightActiveItem(itemId);
+    } else {
+        detailEl.style.display = 'none';
+        detailEl.style.minWidth = '';
+        priceSection.style.display = '';
+        if (appItems.length > 0) contentEl.style.display = 'flex';
+        destroyChart();
+        highlightActiveItem(null);
+    }
+}
+
+function highlightActiveItem(itemId) {
+    document.querySelectorAll('#table-name tr.active-item').forEach(tr => tr.classList.remove('active-item'));
+    if (itemId) {
+        const tr = document.querySelector(`#table-name tr[data-item-id="${itemId}"]`);
+        if (tr) tr.classList.add('active-item');
+    }
+}
+
+function destroyChart() {
+    if (currentChart) {
+        currentChart.remove();
+        currentChart = null;
+    }
+    document.getElementById('chart-container').innerHTML = '';
+}
+
+function renderChart(itemId) {
+    const item = appItems.find(i => i.id === itemId);
+    if (!item) return;
+
+    const rotoolLink = document.getElementById('detail-rotool-link');
+    rotoolLink.href = `https://rotool.gungho.jp/item/${item.id}/0/`;
+
+    const records = appAllRecords
+        .filter(r => r.id === itemId)
+        .sort((a, b) => a.ts - b.ts);
+
+    if (records.length === 0) return;
+
+    // Ticker-style header: name ▲/▼ change (%)  vs 1d ago
+    const latestPrice = records[records.length - 1].price;
+    const oneDayAgoMs = records[records.length - 1].ts - 24 * 3600000;
+    const olderRecords = records.filter(r => r.ts <= oneDayAgoMs);
+    const prevPrice = olderRecords.length ? olderRecords[olderRecords.length - 1].price : null;
+
+    const titleEl = document.getElementById('detail-item-name');
+    if (prevPrice && prevPrice > 0) {
+        const diff = latestPrice - prevPrice;
+        const pct = (diff / prevPrice * 100).toFixed(1);
+        const sign = diff > 0 ? '+' : '';
+        const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '';
+        const cls = diff > 0 ? 'positive' : diff < 0 ? 'negative' : '';
+        titleEl.innerHTML = `${item.shortName} <span class="detail-price">${latestPrice.toLocaleString()}</span> <span class="info-value ${cls}">${arrow}${sign}${Math.round(diff).toLocaleString()} (${sign}${pct}%)</span>`;
+    } else {
+        titleEl.innerHTML = `${item.shortName} <span class="detail-price">${latestPrice.toLocaleString()}</span>`;
+    }
+
+    destroyChart();
+
+    const container = document.getElementById('chart-container');
+    const chart = LightweightCharts.createChart(container, {
+        width: container.clientWidth,
+        height: 400,
+        layout: { background: { color: '#ffffff' }, textColor: '#333', attributionLogo: false },
+        grid: {
+            vertLines: { color: '#f0f0f0' },
+            horzLines: { color: '#f0f0f0' },
+        },
+        rightPriceScale: { borderColor: '#ddd' },
+        timeScale: {
+            borderColor: '#ddd',
+            timeVisible: true,
+            secondsVisible: false,
+        },
+        localization: {
+            priceFormatter: v => v.toLocaleString(),
+            timeFormatter: t => {
+                const d = new Date(t * 1000);
+                const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+                const dd = String(d.getUTCDate()).padStart(2, '0');
+                const hh = String(d.getUTCHours()).padStart(2, '0');
+                const mi = String(d.getUTCMinutes()).padStart(2, '0');
+                return `${mm}/${dd} ${hh}:${mi}`;
+            },
+        },
+    });
+
+    const JST_OFFSET = 9 * 3600;
+    const BUCKET_SEC = 3 * 3600; // 3-hour candles
+
+    // Aggregate into OHLC buckets
+    const buckets = new Map();
+    records.forEach(r => {
+        const utcSec = Math.floor(r.ts / 1000);
+        const jstSec = utcSec + JST_OFFSET;
+        const key = Math.floor(jstSec / BUCKET_SEC) * BUCKET_SEC;
+        if (!buckets.has(key)) {
+            buckets.set(key, { time: key, open: r.price, high: r.price, low: r.price, close: r.price });
+        } else {
+            const b = buckets.get(key);
+            b.high = Math.max(b.high, r.price);
+            b.low = Math.min(b.low, r.price);
+            b.close = r.price;
+        }
+    });
+
+    const ohlcData = [...buckets.values()].sort((a, b) => a.time - b.time);
+
+    const series = chart.addSeries(LightweightCharts.CandlestickSeries, {
+        upColor: '#26a69a',
+        downColor: '#ef5350',
+        borderVisible: false,
+        wickUpColor: '#26a69a',
+        wickDownColor: '#ef5350',
+    });
+
+    series.setData(ohlcData);
+
+    // SMA overlays
+    const calcSMA = (data, period) => {
+        const result = [];
+        for (let i = period - 1; i < data.length; i++) {
+            let sum = 0;
+            for (let j = 0; j < period; j++) sum += data[i - j].close;
+            result.push({ time: data[i].time, value: sum / period });
+        }
+        return result;
+    };
+
+    if (ohlcData.length >= 4) {
+        const sma12h = chart.addSeries(LightweightCharts.LineSeries, {
+            color: '#2196f3',
+            lineWidth: 1,
+            priceLineVisible: false,
+            lastValueVisible: false,
+            crosshairMarkerVisible: false,
+        });
+        sma12h.setData(calcSMA(ohlcData, 4));
+    }
+
+    if (ohlcData.length >= 8) {
+        const sma24h = chart.addSeries(LightweightCharts.LineSeries, {
+            color: '#ff9800',
+            lineWidth: 1,
+            priceLineVisible: false,
+            lastValueVisible: false,
+            crosshairMarkerVisible: false,
+        });
+        sma24h.setData(calcSMA(ohlcData, 8));
+    }
+
+    chart.timeScale().fitContent();
+    currentChart = chart;
+
+    const ro = new ResizeObserver(() => {
+        chart.applyOptions({ width: container.clientWidth });
+    });
+    ro.observe(container);
+
+    // Info panel
+    const last = ohlcData[ohlcData.length - 1];
+    const prev = ohlcData.length >= 2 ? ohlcData[ohlcData.length - 2] : null;
+    const allHighs = ohlcData.map(d => d.high);
+    const allLows = ohlcData.map(d => d.low);
+
+    const change = prev ? last.close - prev.close : 0;
+    const changePct = prev && prev.close ? (change / prev.close * 100) : 0;
+    const changeCls = change > 0 ? 'positive' : change < 0 ? 'negative' : '';
+    const changeSign = change > 0 ? '+' : '';
+
+    const sma12hData = ohlcData.length >= 4 ? calcSMA(ohlcData, 4) : [];
+    const sma24hData = ohlcData.length >= 8 ? calcSMA(ohlcData, 8) : [];
+    const sma12hVal = sma12hData.length ? sma12hData[sma12hData.length - 1].value : null;
+    const sma24hVal = sma24hData.length ? sma24hData[sma24hData.length - 1].value : null;
+
+    const fmtP = v => v != null ? Math.round(v).toLocaleString() : '-';
+
+    const infoItems = [
+        ['銘柄', item.shortName, ''],
+        ['現在価格', fmtP(last.close), ''],
+        ['騰落', `${changeSign}${fmtP(change)} (${changeSign}${changePct.toFixed(1)}%)`, changeCls],
+        ['高値', fmtP(Math.max(...allHighs)), ''],
+        ['安値', fmtP(Math.min(...allLows)), ''],
+        ['始値', fmtP(ohlcData[0].open), ''],
+        ['SMA 12h', fmtP(sma12hVal), ''],
+        ['SMA 24h', fmtP(sma24hVal), ''],
+    ];
+
+    document.getElementById('detail-info').innerHTML = infoItems.map(([label, value, cls]) =>
+        `<div class="info-cell"><span class="info-label">${label}</span><span class="info-value ${cls}">${value}</span></div>`
+    ).join('');
+
+    // Ticker (歩み値) - latest 20 records, newest first
+    const JST_OFFSET_MS = 9 * 3600000;
+    const recent = records.slice(-20).reverse();
+    const tickerBody = document.getElementById('ticker-body');
+    tickerBody.innerHTML = recent.map((r, i) => {
+        const d = new Date(r.ts + JST_OFFSET_MS);
+        const hh = String(d.getUTCHours()).padStart(2, '0');
+        const mi = String(d.getUTCMinutes()).padStart(2, '0');
+        const time = `${hh}:${mi}`;
+        const price = r.price.toLocaleString();
+
+        // Compare to next older record
+        const older = i < recent.length - 1 ? recent[i + 1] : null;
+        let diffHtml = '-';
+        let rowCls = '';
+        if (older) {
+            const diff = r.price - older.price;
+            if (diff > 0) { diffHtml = `+${diff.toLocaleString()}`; rowCls = 'tick-up'; }
+            else if (diff < 0) { diffHtml = `${diff.toLocaleString()}`; rowCls = 'tick-down'; }
+            else { diffHtml = '0'; }
+        }
+        return `<div class="ticker-row ${rowCls}"><span>${time}</span><span>${price}</span><span>${diffHtml}</span></div>`;
+    }).join('');
+}
+
+// Row click: navigate to detail (but not when clicking a link)
+document.addEventListener('click', e => {
+    if (e.target.closest('a')) return;
+    const tr = e.target.closest('tr[data-item-id]');
+    if (tr) navigateToItem(tr.dataset.itemId);
+});
+
+window.addEventListener('popstate', () => handleRouting());
+
+document.getElementById('back-btn').addEventListener('click', () => navigateToList());
+
+document.getElementById('title-link').addEventListener('click', e => {
+    e.preventDefault();
+    navigateToList();
+});
 
 document.getElementById('reload-btn').addEventListener('click', () => init());
 

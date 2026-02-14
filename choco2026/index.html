@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <title>チョコ2026値段まとめ</title>
-    <link rel="stylesheet" href="app.css?v=1770983034">
+    <link rel="stylesheet" href="app.css?v=1771108142">
+    <script src="https://unpkg.com/lightweight-charts@5.1.0/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 
 <body>
@@ -24,7 +25,7 @@
     <div id="updating-overlay"><span>更新中...</span></div>
     <div class="page-wrapper">
         <header class="header-area">
-            <h1>チョコ2026値段まとめ</h1>
+            <h1><a id="title-link" href="./">チョコ2026値段まとめ</a></h1>
             <div id="last-updated">Loading...</div>
             <button id="reload-btn" title="データを再取得">🔄</button>
         </header>
@@ -60,6 +61,26 @@
                     <tbody></tbody>
                 </table>
             </section>
+            <section id="detail-view" style="display: none;">
+                <div class="detail-header">
+                    <button id="back-btn">&larr; 価格順</button>
+                    <h2 id="detail-item-name"></h2>
+                    <a id="detail-rotool-link" target="_blank">公式価格🔗</a>
+                </div>
+                <div class="detail-body">
+                    <div class="detail-left">
+                        <div id="chart-container"></div>
+                        <div id="detail-info"></div>
+                    </div>
+                    <div id="ticker-panel">
+                        <div class="ticker-title">歩み値</div>
+                        <div class="ticker-header">
+                            <span>時刻</span><span>価格</span><span>前比</span>
+                        </div>
+                        <div id="ticker-body"></div>
+                    </div>
+                </div>
+            </section>
         </main>
         <hr>
         <footer>
@@ -83,7 +104,7 @@
             </p>
         </footer>
     </div>
-    <script src="app.js?v=1770983034"></script>
+    <script src="app.js?v=1771108142"></script>
 </body>
 
 </html>

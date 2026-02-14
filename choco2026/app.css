@@ -34,6 +34,15 @@ h1 {
     font-weight: bold;
 }
 
+h1 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+h1 a:hover {
+    opacity: 0.7;
+}
+
 #last-updated {
     color: #666;
 }
@@ -162,6 +171,16 @@ td.rank-top1 {
     vertical-align: middle;
 }
 
+tr[data-item-id] {
+    cursor: pointer;
+}
+
+tr.active-item td {
+    background-color: #fff9c4 !important;
+    font-weight: bold;
+    color: #333 !important;
+}
+
 tr:hover td:not(.rank-top1) {
     background-color: #fffde7 !important;
 }
@@ -195,5 +214,172 @@ footer li {
 
 .data-source a {
     color: #888;
+    text-decoration: underline;
+}
+
+/* Detail view */
+#detail-view {
+    flex: 1;
+    min-width: 0;
+}
+
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.detail-header h2 {
+    background: none;
+    color: #333;
+    padding: 0;
+    margin: 0;
+    font-size: 1.3em;
+    white-space: nowrap;
+}
+
+.detail-price {
+    margin-left: 10px;
+    color: var(--price-orange);
+}
+
+.detail-header h2 .info-value {
+    font-size: 0.75em;
+    margin-left: 6px;
+}
+
+#back-btn {
+    background: #444;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+#back-btn:hover {
+    background: #666;
+}
+
+#detail-rotool-link {
+    margin-left: auto;
+    color: #888;
+    text-decoration: underline;
+    font-size: 0.9em;
+}
+
+.detail-body {
+    display: flex;
+    gap: 0;
+}
+
+.detail-left {
+    flex: 1;
+    min-width: 0;
+}
+
+#chart-container {
+    width: 100%;
+    height: 400px;
+}
+
+#ticker-panel {
+    width: 200px;
+    border: 1px solid #ddd;
+    border-left: none;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.8em;
+    background: #fafafa;
+}
+
+.ticker-title {
+    background: #444;
+    color: #fff;
+    text-align: center;
+    padding: 2px 0;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.ticker-header {
+    display: flex;
+    padding: 3px 6px;
+    background: #eee;
+    border-bottom: 1px solid #ddd;
+    font-weight: bold;
+    color: #666;
+}
+
+.ticker-header span:nth-child(1) { flex: 1; text-align: left; }
+.ticker-header span:nth-child(2) { flex: 1; text-align: right; }
+.ticker-header span:nth-child(3) { flex: 1; text-align: right; }
+
+#ticker-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.ticker-row {
+    display: flex;
+    padding: 2px 6px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ticker-row.tick-up {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.ticker-row.tick-down {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.ticker-row span:nth-child(1) { flex: 1; text-align: left; color: #666; }
+.ticker-row span:nth-child(2) { flex: 1; text-align: right; }
+.ticker-row span:nth-child(3) { flex: 1; text-align: right; }
+
+#detail-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0;
+    border: 1px solid #ddd;
+    margin-top: 8px;
+    font-size: 0.85em;
+}
+
+.info-cell {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 10px;
+    border-bottom: 1px solid #eee;
+    border-right: 1px solid #eee;
+}
+
+.info-label {
+    color: #666;
+    white-space: nowrap;
+}
+
+.info-value {
+    font-weight: bold;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.info-value.positive { color: #26a69a; }
+.info-value.negative { color: #ef5350; }
+
+.name-col a {
+    cursor: pointer;
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+.name-col a:hover {
     text-decoration: underline;
 }
