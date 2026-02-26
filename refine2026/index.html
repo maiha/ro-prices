@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>RO:究極精錬2026 相場まとめ</title>
+    <link rel="stylesheet" href="app.css?v=1771410366">
+    <script src="https://unpkg.com/lightweight-charts@5.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://unpkg.com/wanakana"></script>
+    <script src="autocomplete.js"></script>
+</head>
+
+<body>
+    <script src="config.js"></script>
+    <div id="updating-overlay"><span>更新中...</span></div>
+    <div class="page-wrapper">
+
+        <header class="header-area">
+            <div class="header-brand">
+                <h1><a id="title-link" href="./">究極精錬2026 相場まとめ</a></h1>
+            </div>
+
+            <div class="header-search">
+                <div id="item-search-root"></div>
+            </div>
+
+            <div class="header-actions">
+                <div id="last-updated" aria-live="polite">Loading...</div>
+                <button id="reload-btn" title="データを再取得">🔄</button>
+            </div>
+        </header>
+
+        <nav class="main-nav" aria-label="メインナビ">
+            <div class="nav-links">
+                <a id="nav-top" href="./">トップ</a>
+                <a id="nav-matrix" href="./">相場一覧</a>
+                <a id="nav-refined" href="./">精錬値別</a>
+                <a id="nav-item" href="./">個別装備</a>
+            </div>
+            <div class="nav-filter">
+                <span class="nav-filter-label">カスタム表示:</span>
+                <label class="nav-toggle" title="カスタム表示の切り替え">
+                    <input type="checkbox" id="custom-mode-toggle">
+                    <span class="nav-toggle-track"></span>
+                </label>
+                <a id="nav-custom" href="./" class="nav-custom-gear" title="カスタム設定">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="lucide lucide-settings-icon lucide-settings">
+                        <path
+                            d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </a>
+            </div>
+        </nav>
+
+        <div id="loading">読み込み中...</div>
+        <main id="content" class="container" style="display: none;">
+
+            <!-- トップページ -->
+            <section id="top-section" style="display: none;">
+                <div class="section-head">
+                </div>
+                <div class="matrix-wrapper" id="site-overview">
+                    <h2>サイト概要</h2>
+                    <ul>
+                        <li>「究極精錬2026」関連アイテムの取引価格を公式から集約・キャッシュした非公式サイトです。</li>
+                        <li>相場感の情報まとめと、公式サーバーへのアクセス負荷分散を目的としています。</li>
+                        <li>個人運営であり、公式とは一切関係ありません。</li>
+                    </ul>
+
+                    <h2>掲載アイテム</h2>
+                    <ul>
+                        <li><strong>対象：</strong> 究極精錬2026の需要に基づいた装備（主観選定）</li>
+                        <li><strong>制限：</strong> 精錬値+7 ～ +10 のみ抽出 (数が多すぎるので)</li>
+                        <li><strong>追加：</strong> 掲載希望のアイテムがある場合はご連絡ください。検討いたします。</li>
+                    </ul>
+
+                    <h2>更新情報</h2>
+                    <ul>
+                        <li><strong>頻度：</strong> 1時間に1回 (データをゆっくり取得するため、毎時10分ぐらいに反映予定) </li>
+                        <li><strong>備考：</strong> 負荷軽減を優先し、リアルタイム更新は行いません。</li>
+                    </ul>
+
+                    <h2>連絡先</h2>
+                    <ul>
+                        <li><strong>まいは＠RO丼：</strong><a
+                                href="https://ro-mastodon.puyo.jp/@maiha">https://ro-mastodon.puyo.jp/@maiha</a></li>
+                    </ul>
+                </div>
+            </section>
+    </div>
+    </section>
+
+    <!-- 日次相場ページ -->
+    <section id="matrix-section">
+        <div class="section-head">
+            <h2 class="section-lead">日次相場一覧：+10 (G)</h2>
+            <div class="section-actions"></div>
+        </div>
+        <div class="matrix-wrapper">
+            <table id="overall-matrix">
+                <thead>
+                    <tr></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 精錬値別ページ -->
+    <section id="grid-section" style="display: none;">
+        <div class="section-head">
+            <div class="section-actions">
+                <h2 class="section-lead" id="view-date-label">精錬値別</h2>
+            </div>
+            <div class="date-nav-buttons">
+                <button id="prev-day-btn">← 前日</button>
+                <button id="next-day-btn">翌日 →</button>
+            </div>
+        </div>
+        <table id="item-grid">
+            <thead>
+                <tr>
+                    <th class="slot-col">部位</th>
+                    <th class="name-col">アイテム名</th>
+                    <th>+7</th>
+                    <th>+8</th>
+                    <th>+9</th>
+                    <th>+10</th>
+                    <th class="earn-9-10">9→10</th>
+                    <th class="grade-sep">+7(★1)</th>
+                    <th>+8(★1)</th>
+                    <th>+9(★1)</th>
+                    <th>+10(★1)</th>
+                    <th class="earn-9-10">9→10</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <!-- アイテム選択 -->
+    <section id="item-select-section" style="display: none;">
+        <div class="section-head">
+            <h2 class="section-lead">対象アイテム</h2>
+        </div>
+        <div id="item-select-body"></div>
+    </section>
+
+    <!-- カスタム設定 -->
+    <section id="custom-section" style="display: none;">
+        <div class="section-head">
+            <h2 class="section-lead">カスタム表示設定</h2>
+            <div class="section-actions">
+                <span id="custom-count"></span>
+                <button id="custom-all-btn">全選択</button>
+                <button id="custom-none-btn">全解除</button>
+            </div>
+        </div>
+        <div class="help">
+            価格表に表示されるアイテム名を設定できます。
+        </div>
+        <div id="custom-body"></div>
+    </section>
+
+    <!-- チャート詳細 -->
+    <section id="detail-view" style="display: none;">
+        <div class="detail-header">
+            <h2 id="detail-item-name"></h2>
+            <a id="detail-rotool-link" target="_blank">公式価格🔗</a>
+        </div>
+        <div id="detail-matrix-container">
+            <div id="detail-matrix-head"></div>
+            <div id="detail-matrix" class="matrix-wrapper"></div>
+        </div>
+        <div class="detail-body">
+            <div class="detail-left">
+                <div id="chart-container"></div>
+            </div>
+            <div id="ticker-panel">
+                <div class="ticker-title">取引履歴</div>
+                <div class="ticker-header">
+                    <span>日時</span><span>価格</span><span>超越</span><span>精錬</span><span>エンチャント</span><span>カード</span>
+                </div>
+                <div id="ticker-filter"></div>
+                <div id="ticker-body"></div>
+            </div>
+        </div>
+    </section>
+    </main>
+    <hr>
+    <footer>
+        <p>
+            「ラグナロクオンライン」に関連する全ての表現物の権利は以下に帰属します。<br>
+            ©Gravity Co., Ltd. &amp; LeeMyoungJin(studio DTDS) All rights reserved.<br>
+            ©GungHo Online Entertainment, Inc. All Rights Reserved.</p>
+        <div class="data-source">
+            <ul>
+                <li>
+                    アイコン素材: Caz (Cazwolf)「Pixel Fantasy RPG Icons - Complete Free Collection」
+                    （CC BY 4.0 / 一部使用）
+                    配布元: https://cazwolf.itch.io/caz-pixel-free
+                    ライセンス: https://creativecommons.org/licenses/by/4.0/
+                </li>
+                <li>
+                    生データ:
+                    <a href="https://docs.google.com/spreadsheets/d/1mwT77QHFmtmjJVd5MD99wOUY-vVfepwjkHJQ4soQCOc/edit?gid=0#gid=0"
+                        target="_blank">Googleスプレッドシート</a>
+                    (使えそうならご自由にどぞ)
+                </li>
+            </ul>
+        </div>
+
+    </footer>
+    </div>
+    <script type="module" src="app.js?v=1771410366"></script>
+</body>
+
+</html>
