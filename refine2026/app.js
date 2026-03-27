@@ -5,6 +5,7 @@ import {
     handleRouting,
     latestDate,
     navigateBackFromCustom,
+    navigateToAbout,
     navigateToCustom,
     navigateToDate,
     navigateToItem,
@@ -13,11 +14,11 @@ import {
     navigateToMatrix,
     navigateToTop,
 } from './router.js';
-import { overallMatrixUiState, renderOverallMatrix } from './views/overallMatrix.js';
-import { getActiveNames, loadCustomItems, renderCustomSelect, saveCustomItems, updateCustomCount } from './views/custom.js';
-import { bindChartFeatureEvents } from './chartFeature.js';
+import { marketUiState, renderMarket } from './views/market.js';
+import { getActiveNames, loadCustomItems, renderCustom, saveCustomItems, updateCustomCount } from './views/custom.js';
+import { bindItemEvents } from './views/item.js';
 
-bindChartFeatureEvents();
+bindItemEvents();
 
 function bindEvents() {
     document.addEventListener('keydown', e => {
@@ -36,20 +37,20 @@ function bindEvents() {
         // 相場一覧 ページャー
         const matrixWinBtn = e.target.closest('#matrix-section .matrix-win-btn[data-win]');
         if (matrixWinBtn) {
-            overallMatrixUiState.windowSize = Number(matrixWinBtn.dataset.win);
-            overallMatrixUiState.pageStart = null;
-            renderOverallMatrix();
+            marketUiState.windowSize = Number(matrixWinBtn.dataset.win);
+            marketUiState.pageStart = null;
+            renderMarket();
             return;
         }
         if (e.target.closest('#matrix-section .matrix-prev-btn')) {
-            overallMatrixUiState.pageStart = Math.max(0, overallMatrixUiState.pageStart - overallMatrixUiState.windowSize);
-            renderOverallMatrix();
+            marketUiState.pageStart = Math.max(0, marketUiState.pageStart - marketUiState.windowSize);
+            renderMarket();
             return;
         }
         if (e.target.closest('#matrix-section .matrix-next-btn')) {
-            const max = Math.max(0, store.appMatrixDates.length - overallMatrixUiState.windowSize);
-            overallMatrixUiState.pageStart = Math.min(max, overallMatrixUiState.pageStart + overallMatrixUiState.windowSize);
-            renderOverallMatrix();
+            const max = Math.max(0, store.appMatrixDates.length - marketUiState.windowSize);
+            marketUiState.pageStart = Math.min(max, marketUiState.pageStart + marketUiState.windowSize);
+            renderMarket();
             return;
         }
 
@@ -58,7 +59,7 @@ function bindEvents() {
             const allExpanded = allNames.length > 0 && allNames.every(n => store.expandedItems.has(n));
             if (allExpanded) allNames.forEach(n => store.expandedItems.delete(n));
             else allNames.forEach(n => store.expandedItems.add(n));
-            renderOverallMatrix();
+            renderMarket();
             return;
         }
 
@@ -72,7 +73,7 @@ function bindEvents() {
             const name = expandRow.dataset.expandName;
             if (store.expandedItems.has(name)) store.expandedItems.delete(name);
             else store.expandedItems.add(name);
-            renderOverallMatrix();
+            renderMarket();
             return;
         }
 
@@ -100,6 +101,7 @@ function bindEvents() {
 
     document.getElementById('title-link').addEventListener('click', e => { e.preventDefault(); navigateToTop(); });
     document.getElementById('nav-top').addEventListener('click', e => { e.preventDefault(); navigateToTop(); });
+    document.getElementById('nav-about').addEventListener('click', e => { e.preventDefault(); navigateToAbout(); });
     document.getElementById('nav-refined').addEventListener('click', e => { e.preventDefault(); navigateToList(); });
     document.getElementById('nav-matrix').addEventListener('click', e => { e.preventDefault(); navigateToMatrix(); });
     document.getElementById('nav-item').addEventListener('click', e => { e.preventDefault(); navigateToItemSelect(); });
@@ -130,13 +132,13 @@ function bindEvents() {
     document.getElementById('custom-all-btn').addEventListener('click', () => {
         store.appNameMap.forEach((_, item_id) => store.appCustomItems.add(item_id));
         saveCustomItems();
-        renderCustomSelect();
+        renderCustom();
     });
 
     document.getElementById('custom-none-btn').addEventListener('click', () => {
         store.appCustomItems.clear();
         saveCustomItems();
-        renderCustomSelect();
+        renderCustom();
     });
 
     document.getElementById('prev-day-btn').addEventListener('click', () => {

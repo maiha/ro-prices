@@ -3,7 +3,7 @@ import { REFINE_COLS } from '../constants.js';
 import { getCellData, formatPrice, minOf } from '../utils.js';
 import { getActiveNames } from './custom.js';
 
-export function renderMatrix(dateStr) {
+function renderMatrix(dateStr) {
     const tbody = document.querySelector('#item-grid tbody');
     if (!tbody) return;
 
@@ -99,7 +99,7 @@ export function renderMatrix(dateStr) {
     }).join('');
 }
 
-export function renderView(dateStr) {
+export function renderRefined(dateStr) {
     const idx = store.appAvailableDates.indexOf(dateStr);
     const label = document.getElementById('view-date-label');
     const prevBtn = document.getElementById('prev-day-btn');

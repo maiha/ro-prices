@@ -1,11 +1,11 @@
-import { store } from './store.js';
-import { REFINE_COLS, SERIES_COLORS } from './constants.js';
+import { store } from '../store.js';
+import { REFINE_COLS, SERIES_COLORS } from '../constants.js';
 import {
     buildBucketStatsBySeries,
     formatPrice,
     getMatrixCellClass,
     toJSTDate,
-} from './utils.js';
+} from '../utils.js';
 
 const AGG_GRANULARITIES = ['3h', '6h', '1d'];
 const DETAIL_MATRIX_DAYS = 7;
@@ -879,7 +879,7 @@ function recoverChartSelectionFromUrl() {
         chartUiState.selectedSeriesKey = null;
         chartUiState.aggGranularity = nextAgg;
         clearTickerSeriesFilter();
-        renderChart(chartUiState.itemId, { preserveFilters: true, urlHistory: 'replace' });
+        renderItem(chartUiState.itemId, { preserveFilters: true, urlHistory: 'replace' });
         return;
     }
 
@@ -889,7 +889,7 @@ function recoverChartSelectionFromUrl() {
     chartUiState.selectedSeriesKey = hashSeriesKey;
     chartUiState.aggGranularity = nextAgg;
     setTickerSeriesFilterByKey(hashSeriesKey);
-    renderChart(chartUiState.itemId, { preserveFilters: true, urlHistory: 'none' });
+    renderItem(chartUiState.itemId, { preserveFilters: true, urlHistory: 'none' });
 }
 
 function getDefaultSeriesKey() {
@@ -1466,7 +1466,7 @@ function renderDetailMatrix(itemId) {
     container.innerHTML = `<table id="detail-item-matrix"><thead><tr>${headerCells}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-export function destroyChart() {
+export function destroyItem() {
     destroySingleChart('raw');
     destroySingleChart('agg');
 
@@ -1481,7 +1481,7 @@ export function destroyChart() {
     if (aggContainer) aggContainer.innerHTML = '';
 }
 
-export function renderChart(itemId, refineOrOptions = {}, maybeOptions = {}) {
+export function renderItem(itemId, refineOrOptions = {}, maybeOptions = {}) {
     let options = {};
     let explicitRefine = null;
 
@@ -1544,7 +1544,7 @@ export function renderChart(itemId, refineOrOptions = {}, maybeOptions = {}) {
         };
     }
 
-    destroyChart();
+    destroyItem();
     renderAggGranularityControls();
 
     if (itemRecords.length === 0) {
@@ -1596,7 +1596,7 @@ export function renderChart(itemId, refineOrOptions = {}, maybeOptions = {}) {
     updateDetailMatrixHighlight();
 }
 
-export function bindChartFeatureEvents() {
+export function bindItemEvents() {
     ['ticker-filter', 'ticker-body'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -1620,7 +1620,7 @@ export function bindChartFeatureEvents() {
         renderAggGranularityControls();
 
         if (chartUiState.itemId) {
-            renderChart(chartUiState.itemId, { preserveFilters: true, urlHistory: 'push' });
+            renderItem(chartUiState.itemId, { preserveFilters: true, urlHistory: 'push' });
         }
     });
 
@@ -1664,7 +1664,7 @@ export function bindChartFeatureEvents() {
         setTickerSeriesFilterByKey(chartUiState.selectedSeriesKey);
 
         if (chartUiState.itemId) {
-            renderChart(chartUiState.itemId, { preserveFilters: true, urlHistory: 'push' });
+            renderItem(chartUiState.itemId, { preserveFilters: true, urlHistory: 'push' });
         }
     });
 

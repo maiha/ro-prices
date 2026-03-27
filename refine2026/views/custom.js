@@ -38,7 +38,7 @@ export function updateCustomCount() {
     el.textContent = store.appCustomItems.size > 0 ? `${store.appCustomItems.size}件選択中` : '全表示中';
 }
 
-export function renderCustomSelect() {
+export function renderCustom() {
     const byKind = new Map();
     store.appNameMap.forEach((name, item_id) => {
         const kind = store.appKindMap.has(item_id) ? store.appKindMap.get(item_id) : -1;

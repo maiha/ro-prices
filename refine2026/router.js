@@ -1,10 +1,11 @@
 import { store } from './store.js';
 import { expandDate, toJSTDate } from './utils.js';
-import { renderView } from './views/refined.js';
-import { renderItemSelect } from './views/itemSelect.js';
-import { renderOverallMatrix } from './views/overallMatrix.js';
-import { renderCustomSelect } from './views/custom.js';
-import { renderChart } from './chartFeature.js';
+import { renderTop } from './views/top.js';
+import { renderRefined } from './views/refined.js';
+import { renderItems } from './views/items.js';
+import { renderMarket } from './views/market.js';
+import { renderCustom } from './views/custom.js';
+import { renderItem } from './views/item.js';
 
 let lastDate = null;
 let lastHashBeforeCustom = '#refined';
@@ -26,6 +27,11 @@ export function latestDate() {
 
 export function navigateToTop() {
     history.pushState({}, '', '#top');
+    handleRouting();
+}
+
+export function navigateToAbout() {
+    history.pushState({}, '', '#about');
     handleRouting();
 }
 
@@ -87,14 +93,16 @@ export function handleRouting() {
 
     const contentEl = document.getElementById('content');
     const topSection = document.getElementById('top-section');
+    const aboutSection = document.getElementById('about-section');
     const matrixSection = document.getElementById('matrix-section');
     const gridSection = document.getElementById('grid-section');
     const detailEl = document.getElementById('detail-view');
     const itemSelectSection = document.getElementById('item-select-section');
     const customSection = document.getElementById('custom-section');
 
-    const show = (top, matrix, grid, detail, itemSelect, custom) => {
+    const show = (top, about, matrix, grid, detail, itemSelect, custom) => {
         topSection.style.display = top ? '' : 'none';
+        aboutSection.style.display = about ? '' : 'none';
         matrixSection.style.display = matrix ? '' : 'none';
         gridSection.style.display = grid ? '' : 'none';
         detailEl.style.display = detail ? 'block' : 'none';
@@ -104,33 +112,40 @@ export function handleRouting() {
     };
 
     document.getElementById('nav-top').classList.toggle('active', view === 'top');
+    document.getElementById('nav-about').classList.toggle('active', view === 'about');
     document.getElementById('nav-matrix').classList.toggle('active', view === 'market');
     document.getElementById('nav-refined').classList.toggle('active', view === 'refined');
     document.getElementById('nav-item').classList.toggle('active', view === 'item' || view === 'items');
     document.getElementById('nav-custom').classList.toggle('active', view === 'custom');
 
     if (view === 'top') {
-        show(true, false, false, false, false, false);
+        show(true, false, false, false, false, false, false);
+        if (store.appAllRecords.length) renderTop();
+        return;
+    }
+
+    if (view === 'about') {
+        show(false, true, false, false, false, false, false);
         return;
     }
 
     if (!store.appAllRecords.length) return;
 
     if (view === 'item' && itemId) {
-        show(false, false, false, true, false, false);
-        renderChart(itemId);
+        show(false, false, false, false, true, false, false);
+        renderItem(itemId);
     } else if (view === 'items') {
-        show(false, false, false, false, true, false);
-        renderItemSelect();
+        show(false, false, false, false, false, true, false);
+        renderItems();
     } else if (view === 'refined') {
-        show(false, false, true, false, false, false);
-        renderView(dateStr);
+        show(false, false, false, true, false, false, false);
+        renderRefined(dateStr);
     } else if (view === 'market') {
-        show(false, true, false, false, false, false);
-        renderOverallMatrix();
+        show(false, false, true, false, false, false, false);
+        renderMarket();
     } else if (view === 'custom') {
-        show(false, false, false, false, false, true);
-        renderCustomSelect();
+        show(false, false, false, false, false, false, true);
+        renderCustom();
     } else {
         history.replaceState({}, '', '#top');
         handleRouting();

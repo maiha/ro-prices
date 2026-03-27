@@ -4,12 +4,12 @@ import { getCellData, getMatrixCellClass, formatPrice, minOf } from '../utils.js
 import { getActiveNames } from './custom.js';
 
 // 列ページネーション状態
-export const overallMatrixUiState = {
+export const marketUiState = {
     windowSize: 14,   // 表示する日付列数: 7 | 14 | 30
     pageStart: null,  // 表示開始インデックス（null = 最新ページに自動セット）
 };
 
-export function renderOverallMatrix() {
+export function renderMarket() {
     const table = document.getElementById('overall-matrix');
     if (!table) return;
 
@@ -18,11 +18,11 @@ export function renderOverallMatrix() {
     const allExpanded = names.length > 0 && names.every(n => store.expandedItems.has(n));
 
     // ページウィンドウ計算
-    const ws = overallMatrixUiState.windowSize;
+    const ws = marketUiState.windowSize;
     const maxStart = Math.max(0, allDates.length - ws);
-    if (overallMatrixUiState.pageStart === null) overallMatrixUiState.pageStart = maxStart;
-    const pageStart = Math.max(0, Math.min(overallMatrixUiState.pageStart, maxStart));
-    overallMatrixUiState.pageStart = pageStart;
+    if (marketUiState.pageStart === null) marketUiState.pageStart = maxStart;
+    const pageStart = Math.max(0, Math.min(marketUiState.pageStart, maxStart));
+    marketUiState.pageStart = pageStart;
     const dates = allDates.slice(pageStart, pageStart + ws);
 
     const prevDisabled = pageStart === 0;
