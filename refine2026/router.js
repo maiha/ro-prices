@@ -1,6 +1,7 @@
 import { store } from './store.js';
 import { expandDate, toJSTDate } from './utils.js';
 import { renderTop } from './views/top.js';
+import { renderRanking } from './views/ranking.js';
 import { renderRefined } from './views/refined.js';
 import { renderItems } from './views/items.js';
 import { renderMarket } from './views/market.js';
@@ -27,6 +28,11 @@ export function latestDate() {
 
 export function navigateToTop() {
     history.pushState({}, '', '#top');
+    handleRouting();
+}
+
+export function navigateToRanking() {
+    history.pushState({}, '', '#ranking');
     handleRouting();
 }
 
@@ -58,6 +64,15 @@ export function navigateToList() {
 export function navigateToItem(itemId) {
     lastDate = currentDateParam() || latestDate();
     history.pushState({}, '', `#item/${itemId}`);
+    handleRouting();
+}
+
+export function navigateToItemSeries(itemId, seriesKey) {
+    const [grade, refine] = String(seriesKey).split('_').map(Number);
+    lastDate = currentDateParam() || latestDate();
+    let hash = `#item/${itemId}/refine/${refine}`;
+    if (grade !== 0) hash += `/grade/${grade}`;
+    history.pushState({}, '', hash);
     handleRouting();
 }
 
@@ -93,6 +108,7 @@ export function handleRouting() {
 
     const contentEl = document.getElementById('content');
     const topSection = document.getElementById('top-section');
+    const rankingSection = document.getElementById('ranking-section');
     const aboutSection = document.getElementById('about-section');
     const matrixSection = document.getElementById('matrix-section');
     const gridSection = document.getElementById('grid-section');
@@ -100,8 +116,9 @@ export function handleRouting() {
     const itemSelectSection = document.getElementById('item-select-section');
     const customSection = document.getElementById('custom-section');
 
-    const show = (top, about, matrix, grid, detail, itemSelect, custom) => {
+    const show = (top, ranking, about, matrix, grid, detail, itemSelect, custom) => {
         topSection.style.display = top ? '' : 'none';
+        rankingSection.style.display = ranking ? '' : 'none';
         aboutSection.style.display = about ? '' : 'none';
         matrixSection.style.display = matrix ? '' : 'none';
         gridSection.style.display = grid ? '' : 'none';
@@ -112,6 +129,7 @@ export function handleRouting() {
     };
 
     document.getElementById('nav-top').classList.toggle('active', view === 'top');
+    document.getElementById('nav-ranking').classList.toggle('active', view === 'ranking');
     document.getElementById('nav-about').classList.toggle('active', view === 'about');
     document.getElementById('nav-matrix').classList.toggle('active', view === 'market');
     document.getElementById('nav-refined').classList.toggle('active', view === 'refined');
@@ -119,32 +137,35 @@ export function handleRouting() {
     document.getElementById('nav-custom').classList.toggle('active', view === 'custom');
 
     if (view === 'top') {
-        show(true, false, false, false, false, false, false);
+        show(true, false, false, false, false, false, false, false);
         if (store.appAllRecords.length) renderTop();
         return;
     }
 
     if (view === 'about') {
-        show(false, true, false, false, false, false, false);
+        show(false, false, true, false, false, false, false, false);
         return;
     }
 
     if (!store.appAllRecords.length) return;
 
-    if (view === 'item' && itemId) {
-        show(false, false, false, false, true, false, false);
+    if (view === 'ranking') {
+        show(false, true, false, false, false, false, false, false);
+        renderRanking();
+    } else if (view === 'item' && itemId) {
+        show(false, false, false, false, false, true, false, false);
         renderItem(itemId);
     } else if (view === 'items') {
-        show(false, false, false, false, false, true, false);
+        show(false, false, false, false, false, false, true, false);
         renderItems();
     } else if (view === 'refined') {
-        show(false, false, false, true, false, false, false);
+        show(false, false, false, false, true, false, false, false);
         renderRefined(dateStr);
     } else if (view === 'market') {
-        show(false, false, true, false, false, false, false);
+        show(false, false, false, true, false, false, false, false);
         renderMarket();
     } else if (view === 'custom') {
-        show(false, false, false, false, false, false, true);
+        show(false, false, false, false, false, false, false, true);
         renderCustom();
     } else {
         history.replaceState({}, '', '#top');

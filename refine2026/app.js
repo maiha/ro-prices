@@ -12,6 +12,7 @@ import {
     navigateToItemSelect,
     navigateToList,
     navigateToMatrix,
+    navigateToRanking,
     navigateToTop,
 } from './router.js';
 import { marketUiState, renderMarket } from './views/market.js';
@@ -101,6 +102,7 @@ function bindEvents() {
 
     document.getElementById('title-link').addEventListener('click', e => { e.preventDefault(); navigateToTop(); });
     document.getElementById('nav-top').addEventListener('click', e => { e.preventDefault(); navigateToTop(); });
+    document.getElementById('nav-ranking').addEventListener('click', e => { e.preventDefault(); navigateToRanking(); });
     document.getElementById('nav-about').addEventListener('click', e => { e.preventDefault(); navigateToAbout(); });
     document.getElementById('nav-refined').addEventListener('click', e => { e.preventDefault(); navigateToList(); });
     document.getElementById('nav-matrix').addEventListener('click', e => { e.preventDefault(); navigateToMatrix(); });

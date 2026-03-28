@@ -1588,3 +1588,6 @@ th.earn-9-10::after {
 .tbp-change { font-size: 0.9em; }
 .tbp-change.positive { color: #e65100; }
 .tbp-change.negative { color: #1565c0; }
+
+.ranking-cards { padding: 8px 0; }
+.ranking-date  { font-size: 0.85em; color: #999; }
